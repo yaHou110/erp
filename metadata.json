@@ -1,0 +1,6 @@
+{
+  "name": "سامانه کاوش - Kavosh ERP",
+  "description": "سامانه یکپارچه برنامه‌ریزی منابع سازمانی (ERP) چندشرکته و ماژولار هلدینگ صنعتی پارس",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ModuleId, Subsidiary, InventoryItem, ApprovalTask } from './types/erp';
+import { ModuleId, Subsidiary, InventoryItem, ApprovalTask, LicensePlanType } from './types/erp';
 import {
   SUBSIDIARIES,
   WAREHOUSES,
@@ -21,6 +21,8 @@ import { AnalyticsBiView } from './components/AnalyticsBiView';
 import { AuditConfigView } from './components/AuditConfigView';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { NewDocumentModal } from './components/NewDocumentModal';
+import { AccountingFinanceView } from './components/AccountingFinanceView';
+import { PricingPlansModal } from './components/PricingPlansModal';
 
 export default function App() {
   const [activeModule, setActiveModule] = useState<ModuleId>('command-center');
@@ -29,7 +31,10 @@ export default function App() {
   const [approvalTasks, setApprovalTasks] = useState<ApprovalTask[]>(APPROVAL_INBOX_TASKS);
   const [isCommandPaletteOpen, setIsCommandPaletteOpen] = useState(false);
   const [isNewDocModalOpen, setIsNewDocModalOpen] = useState(false);
+  const [isPricingModalOpen, setIsPricingModalOpen] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<LicensePlanType>('enterprise');
   const [globalNotification, setGlobalNotification] = useState<string | null>(null);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   // Global Ctrl + K listener
   useEffect(() => {
@@ -79,10 +84,13 @@ export default function App() {
         onSelectModule={setActiveModule}
         currentSubsidiary={currentSubsidiary}
         pendingApprovalsCount={pendingApprovalsCount}
+        currentPlan={currentPlan}
+        isCollapsed={isSidebarCollapsed}
+        onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
       />
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex flex-col mr-64">
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${isSidebarCollapsed ? 'mr-16' : 'mr-64'}`}>
         {/* Top Header */}
         <Header
           currentSubsidiary={currentSubsidiary}
@@ -95,10 +103,49 @@ export default function App() {
           onOpenNewDocModal={() => setIsNewDocModalOpen(true)}
           onOpenCommandPalette={() => setIsCommandPaletteOpen(true)}
           unreadCount={pendingApprovalsCount}
+          currentPlan={currentPlan}
+          onOpenPlansModal={() => setIsPricingModalOpen(true)}
+          isSidebarCollapsed={isSidebarCollapsed}
         />
 
         {/* Viewport Content Container */}
         <main className="flex-1 p-5 mt-16 max-w-7xl w-full mx-auto">
+          {/* Top Unified Himoura & Plan Banner */}
+          <div className="bg-gradient-to-r from-[#002045] via-[#0a2756] to-[#002045] text-white p-3 rounded-xl flex flex-col md:flex-row items-center justify-between gap-4 border border-[#3b82f6]/30 shadow-lg mb-6 relative overflow-hidden group">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#22c55e] to-[#3b82f6]"></div>
+            <div className="absolute -right-6 -top-6 opacity-10">
+              <span className="material-symbols-outlined text-[80px]">code</span>
+            </div>
+            
+            <div className="flex items-center gap-3 relative z-10">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#22c55e] animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)] shrink-0"></span>
+              <div className="flex flex-col">
+                <span className="text-sm font-bold tracking-wide">توسعه و پیاده‌سازی: گروه نرم‌افزاری هیمورا</span>
+                <span className="text-[10px] text-[#adc7f7]">راهکارهای جامع سازمانی (ERP) و هوشمندسازی فرآیندها</span>
+              </div>
+              <div className="hidden lg:flex items-center bg-white/10 px-3 py-1 rounded border border-white/20 mr-2 backdrop-blur-sm">
+                <span className="text-xs font-mono tracking-widest font-bold">09354467269</span>
+                <a href="tel:09354467269" className="text-[9px] bg-white text-[#002045] px-2 py-0.5 rounded font-bold hover:bg-[#e6eeff] transition-colors shadow-sm mr-3">مشاوره</a>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 relative z-10">
+              <div className="flex items-center gap-1.5 bg-white/10 px-3 py-1.5 rounded border border-white/10 backdrop-blur-sm">
+                <span className="text-[11px] text-[#adc7f7]">لایسنس دمو:</span>
+                <span className="text-xs font-bold font-mono tracking-tight text-[#22c55e]">
+                  {currentPlan.toUpperCase()}
+                </span>
+              </div>
+              <button 
+                onClick={() => setIsPricingModalOpen(true)} 
+                className="text-xs bg-[#3b82f6] hover:bg-[#2563eb] text-white px-4 py-1.5 rounded font-bold transition-colors shadow border border-[#60a5fa]/50 flex items-center gap-1.5"
+              >
+                <span className="material-symbols-outlined text-[16px]">verified</span>
+                تغییر پلن
+              </button>
+            </div>
+          </div>
+
           {activeModule === 'command-center' && (
             <CommandCenterView
               currentSubsidiary={currentSubsidiary}
@@ -148,6 +195,10 @@ export default function App() {
             />
           )}
 
+          {activeModule === 'finance' && (
+            <AccountingFinanceView />
+          )}
+
           {activeModule === 'audit-config' && (
             <AuditConfigView
               workflowRules={WORKFLOW_RULES}
@@ -174,6 +225,20 @@ export default function App() {
         subsidiaries={SUBSIDIARIES}
         warehouses={WAREHOUSES}
         onDocumentCreated={handleDocumentCreated}
+      />
+
+      {/* Pricing Plans Modal */}
+      <PricingPlansModal
+        isOpen={isPricingModalOpen}
+        onClose={() => setIsPricingModalOpen(false)}
+        currentPlan={currentPlan}
+        onSelectPlan={(plan) => {
+          setCurrentPlan(plan);
+          setActiveModule('command-center'); // reset to dashboard on plan change to prevent being on locked route
+          setIsPricingModalOpen(false);
+          setGlobalNotification(`لایسنس سیستم به '${plan}' تغییر یافت.`);
+          setTimeout(() => setGlobalNotification(null), 3000);
+        }}
       />
     </div>
   );

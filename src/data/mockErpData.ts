@@ -874,3 +874,86 @@ export const AUDIT_TRAIL_GLOBAL: AuditEntry[] = [
     sha256Hash: 'a71b29ce0019284fbc9901928374619283746192837461928374619283746192',
   },
 ];
+
+import { AccountingTransaction, BankAccountBalance } from '../types/erp';
+
+export const mockAccountingTransactions: AccountingTransaction[] = [
+  {
+    id: 'acc-1',
+    documentNumber: 'DOC-1403-08-0125',
+    date: '۱۴۰۳/۰۸/۲۲',
+    description: 'تسویه فاکتور خرید مواد اولیه پلیمری - شرکت پتروشیمی شازند',
+    subsidiaryName: 'شرکت تولیدی صنعتی هیمورا',
+    type: 'payment',
+    totalDebitRials: 18500000000,
+    totalCreditRials: 18500000000,
+    status: 'posted',
+    creatorName: 'مریم باقری (خزانه)',
+  },
+  {
+    id: 'acc-2',
+    documentNumber: 'DOC-1403-08-0126',
+    date: '۱۴۰۳/۰۸/۲۲',
+    description: 'صدور فاکتور فروش تجهیزات برودتی - مشتری: شرکت توسعه تجارت البرز',
+    subsidiaryName: 'شرکت تولیدی صنعتی هیمورا',
+    type: 'invoice',
+    totalDebitRials: 5200000000,
+    totalCreditRials: 5200000000,
+    status: 'draft',
+    creatorName: 'امیر حسینی (حسابداری فروش)',
+  },
+  {
+    id: 'acc-3',
+    documentNumber: 'DOC-1403-08-0127',
+    date: '۱۴۰۳/۰۸/۲۱',
+    description: 'سند حقوق و دستمزد مهرماه ۱۴۰۳ - کارخانه تبریز',
+    subsidiaryName: 'مجتمع فولاد هیمورا',
+    type: 'general_journal',
+    totalDebitRials: 42000000000,
+    totalCreditRials: 42000000000,
+    status: 'posted',
+    creatorName: 'سید علی موسوی (مدیر مالی)',
+  },
+  {
+    id: 'acc-4',
+    documentNumber: 'DOC-1403-08-0128',
+    date: '۱۴۰۳/۰۸/۲۱',
+    description: 'وصول چک صیادی شماره 88349202 بابت پیش‌فاکتور 9928',
+    subsidiaryName: 'بازرگانی هیمورا (واردات/صادرات)',
+    type: 'receipt',
+    totalDebitRials: 3500000000,
+    totalCreditRials: 3500000000,
+    status: 'posted',
+    creatorName: 'مریم باقری (خزانه)',
+  }
+];
+
+export const mockBankBalances: BankAccountBalance[] = [
+  {
+    id: 'bank-1',
+    bankName: 'بانک ملت (شعبه مرکزی تبریز)',
+    accountNumber: '4883920012',
+    accountType: 'جاری شرکتی',
+    currentBalanceRials: 145800000000,
+    availableBalanceRials: 145800000000,
+    lastSyncTime: '۱۴۰۳/۰۸/۲۲ - ۱۰:۱۵',
+  },
+  {
+    id: 'bank-2',
+    bankName: 'بانک تجارت (ارزی)',
+    accountNumber: '8839201994',
+    accountType: 'حساب درهم (معادل ریالی)',
+    currentBalanceRials: 320000000000,
+    availableBalanceRials: 320000000000,
+    lastSyncTime: '۱۴۰۳/۰۸/۲۲ - ۰۹:۳۰',
+  },
+  {
+    id: 'bank-3',
+    bankName: 'بانک صادرات (سپرده کوتاه‌مدت)',
+    accountNumber: '021839201994',
+    accountType: 'سپرده پشتیبان',
+    currentBalanceRials: 50000000000,
+    availableBalanceRials: 50000000000,
+    lastSyncTime: '۱۴۰۳/۰۸/۲۱ - ۲۳:۵۹',
+  },
+];

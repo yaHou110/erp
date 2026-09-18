@@ -227,3 +227,28 @@ export interface WorkflowRuleConfig {
   requiredRoles: string[];
   isActive: boolean;
 }
+
+export type LicensePlanType = 'basic' | 'standard' | 'pro' | 'enterprise';
+
+export interface AccountingTransaction {
+  id: string;
+  documentNumber: string;
+  date: string;
+  description: string;
+  subsidiaryName: string;
+  type: 'general_journal' | 'payment' | 'receipt' | 'invoice' | 'bill';
+  totalDebitRials: number;
+  totalCreditRials: number;
+  status: 'draft' | 'posted' | 'voided';
+  creatorName: string;
+}
+
+export interface BankAccountBalance {
+  id: string;
+  bankName: string;
+  accountNumber: string;
+  accountType: string;
+  currentBalanceRials: number;
+  availableBalanceRials: number;
+  lastSyncTime: string;
+}

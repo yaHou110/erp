@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { InventoryItem, ModuleId } from '../types/erp';
 
+// Declare SpeechRecognition interfaces for TypeScript
+declare global {
+  interface Window {
+    SpeechRecognition: any;
+    webkitSpeechRecognition: any;
+  }
+}
+
 interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
@@ -17,6 +25,44 @@ export const CommandPaletteModal: React.FC<CommandPaletteProps> = ({
   onSelectPo,
 }) => {
   const [query, setQuery] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      setVoiceSupported(true);
+    }
+  }, []);
+
+  const handleVoiceSearch = () => {
+    if (!voiceSupported) return;
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'fa-IR';
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setQuery(transcript);
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      setIsListening(false);
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+
+    recognition.start();
+  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -64,9 +110,20 @@ export const CommandPaletteModal: React.FC<CommandPaletteProps> = ({
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="جستجوی سریع در کاتالوگ کالا، اسناد خرید، کمیسیون، مشتریان..."
+            placeholder={isListening ? "در حال گوش دادن..." : "جستجوی سریع در کاتالوگ کالا، اسناد خرید، کمیسیون، مشتریان..."}
             className="w-full bg-transparent text-xs text-[#0d1c2e] outline-none placeholder-[#74777f]"
           />
+          {voiceSupported && (
+            <button
+              onClick={handleVoiceSearch}
+              className={`p-1.5 rounded-full flex items-center justify-center transition-colors ml-2 ${
+                isListening ? 'bg-[#ffdad6] text-[#ba1a1a] animate-pulse' : 'hover:bg-[#e6eeff] text-[#3b82f6]'
+              }`}
+              title="جستجوی صوتی"
+            >
+              <span className="material-symbols-outlined text-[18px]">mic</span>
+            </button>
+          )}
           <kbd className="px-2 py-0.5 rounded bg-[#e6eeff] text-[10px] font-mono text-[#505f7b]">
             ESC
           </kbd>
